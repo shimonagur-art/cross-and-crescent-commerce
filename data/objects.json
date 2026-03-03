@@ -565,7 +565,8 @@
       "toLng": 2.2137,
       "toLabel": "France",
       "influence": "commerce",
-      "endNote": "Add text here"
+      "endNote": "Add text here",
+      "curve": { "side": -1 }
     },
     {
       "order": 3,
