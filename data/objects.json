@@ -529,9 +529,9 @@
       "lng": 37.1343
     },
     {
-      "label": "Cumbria",
-      "lat": 54.5772,
-      "lng": -2.7975
+      "label": "Venice",
+      "lat": 45.4408,
+      "lng": 12.3155
     },
     {
       "label": "France",
@@ -539,31 +539,43 @@
       "lng": 2.2137
     },
     {
-      "label": "Venice",
-      "lat": 45.4408,
-      "lng": 12.3155
+      "label": "Cumbria",
+      "lat": 54.5772,
+      "lng": -2.7975
     }
   ],
   "routes": [
     {
-      "toLat": 54.5772,
-      "toLng": -2.7975,
-      "influence": "commerce",
-      "toLabel": "Cumbria",
-      "endNote": "Add text here"
-    },
-    {
-      "toLat": 48.8566,
-      "toLng": 2.3522,
-      "influence": "culture",
-      "toLabel": "France",
-      "endNote": "Add text here"
-    },
-    {
+      "order": 1,
+      "fromLat": 36.2021,
+      "fromLng": 37.1343,
+      "fromLabel": "Middle East (Most likely Syria or Egypt)",
       "toLat": 45.4408,
       "toLng": 12.3155,
-      "influence": "culture",
       "toLabel": "Venice",
+      "influence": "commerce",
+      "endNote": "Add text here"
+    },
+    {
+      "order": 2,
+      "fromLat": 45.4408,
+      "fromLng": 12.3155,
+      "fromLabel": "Venice",
+      "toLat": 46.2276,
+      "toLng": 2.2137,
+      "toLabel": "France",
+      "influence": "commerce",
+      "endNote": "Add text here"
+    },
+    {
+      "order": 3,
+      "fromLat": 46.2276,
+      "fromLng": 2.2137,
+      "fromLabel": "France",
+      "toLat": 54.5772,
+      "toLng": -2.7975,
+      "toLabel": "Cumbria",
+      "influence": "commerce",
       "endNote": "Add text here"
     }
   ]
