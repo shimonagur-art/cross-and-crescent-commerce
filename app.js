@@ -197,28 +197,33 @@ function buildCurvedPoints(fromLatLng, toLatLng, steps = 28, curveOpts = {}) {
 }
 
 async function animateRouteCrawlCurved(polyline, { points, durationMs = 1500, delayMs = 0, token } = {}) {
-  if (delayMs > 0) await new Promise(r => setTimeout(r, delayMs));
-  if (token !== renderToken) return;
+  return new Promise(async (resolve) => {
+    if (delayMs > 0) await new Promise(r => setTimeout(r, delayMs));
+    if (token !== renderToken) return resolve();
 
-  const allow = Array.isArray(points) ? points : [];
-  if (allow.length < 2) return;
+    const allow = Array.isArray(points) ? points : [];
+    if (allow.length < 2) return resolve();
 
-  const start = performance.now();
+    const start = performance.now();
 
-  function frame(now) {
-    if (token !== renderToken) return;
+    function frame(now) {
+      if (token !== renderToken) return resolve();
 
-    const t = Math.min(1, (now - start) / durationMs);
-    const e = easeLinear(t);
+      const t = Math.min(1, (now - start) / durationMs);
+      const e = easeLinear(t);
 
-    const n = Math.max(2, Math.floor(e * (allow.length - 1)) + 1);
-    polyline.setLatLngs(allow.slice(0, n));
+      const n = Math.max(2, Math.floor(e * (allow.length - 1)) + 1);
+      polyline.setLatLngs(allow.slice(0, n));
 
-    if (t < 1) requestAnimationFrame(frame);
-    else polyline.setLatLngs(allow);
-  }
+      if (t < 1) requestAnimationFrame(frame);
+      else {
+        polyline.setLatLngs(allow);
+        resolve();
+      }
+    }
 
-  requestAnimationFrame(frame);
+    requestAnimationFrame(frame);
+  });
 }
 
 // ---------------- Tooltip + panel HTML ----------------
@@ -358,7 +363,7 @@ function drawForObject(objectId) {
     return;
   }
 
-  // ✅ Origin = FIRST location only (routes come out from here)
+  // ✅ Origin = FIRST location only (default behaviour for most objects)
   const origin = locations[0];
   if (!origin || origin.lat == null || origin.lng == null) {
     setPanel(obj.title || obj.id || "Object", `<p>First location is missing lat/lng for this object.</p>`);
@@ -385,7 +390,79 @@ function drawForObject(objectId) {
     addMarkerOnce(loc.lat, loc.lng, loc.label);
   }
 
-  // Draw routes ONLY from origin
+  // -------- SPECIAL CASE: obj_013 sequential legs --------
+  // For this object only, we support routes with fromLat/fromLng and animate them one-after-another.
+  if (obj.id === "obj_013") {
+    (async () => {
+      // Sort by explicit order if present (otherwise keep file order)
+      const legs = routes
+        .filter(r => r?.toLat != null && r?.toLng != null)
+        .slice()
+        .sort((a, b) => (Number(a?.order ?? 0) - Number(b?.order ?? 0)));
+
+      let prevTo = null;
+
+      for (let i = 0; i < legs.length; i++) {
+        if (token !== renderToken) return;
+
+        const r = legs[i];
+
+        // From:
+        // Prefer explicit fromLat/fromLng; otherwise chain from previous "to"; otherwise fall back to origin
+        const fromLat = (r?.fromLat != null) ? Number(r.fromLat) : (prevTo ? prevTo.lat : Number(origin.lat));
+        const fromLng = (r?.fromLng != null) ? Number(r.fromLng) : (prevTo ? prevTo.lng : Number(origin.lng));
+
+        const toLat = Number(r.toLat);
+        const toLng = Number(r.toLng);
+
+        const from = L.latLng(fromLat, fromLng);
+        const to   = L.latLng(toLat, toLng);
+
+        if (!Number.isFinite(from.lat) || !Number.isFinite(from.lng)) continue;
+        if (!Number.isFinite(to.lat) || !Number.isFinite(to.lng)) continue;
+
+        // curve options (preserve your existing per-route curve config)
+        const c = r.curve || {};
+        const autoSide = (i % 2 === 0) ? 1 : -1;
+
+        const curveOpts = {
+          strength: (c.strength != null) ? Number(c.strength) : undefined,
+          min:      (c.min != null) ? Number(c.min) : undefined,
+          max:      (c.max != null) ? Number(c.max) : undefined,
+          side:     (c.side === 1 || c.side === -1) ? c.side : autoSide
+        };
+
+        const curvePts = buildCurvedPoints(from, to, 28, curveOpts);
+
+        const routeLine = L.polyline(curvePts.slice(0, 2), {
+          color: BLUE,
+          weight: 3,
+          opacity: 0.9,
+          dashArray: "6 8"
+        }).addTo(routesLayer);
+
+        // Ensure markers exist for both ends (no stacks)
+        addMarkerOnce(from.lat, from.lng, r.fromLabel || "Route start");
+        addMarkerOnce(to.lat, to.lng, r.toLabel || "Destination");
+
+        // ✅ Sequential: wait for this leg to finish before starting next
+        await animateRouteCrawlCurved(routeLine, {
+          points: curvePts,
+          durationMs: 1500,
+          delayMs: 0,
+          token
+        });
+
+        prevTo = to;
+      }
+    })();
+
+    setPanel("Select a marker", `<p>Hover markers to preview. Click a marker to see full details.</p>`);
+    return;
+  }
+  // -------- END special case --------
+
+  // -------- Default behaviour for ALL other objects (unchanged): routes ONLY from origin --------
   const from = L.latLng(Number(origin.lat), Number(origin.lng));
   if (!Number.isFinite(from.lat) || !Number.isFinite(from.lng)) {
     setPanel(obj.title || obj.id || "Object", `<p>Invalid origin coordinates.</p>`);
