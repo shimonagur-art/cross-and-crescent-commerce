@@ -566,7 +566,7 @@
       "toLabel": "France",
       "influence": "commerce",
       "endNote": "Add text here",
-      "curve": { "side": -1 }
+      "curve": { "side": 1 }
     },
     {
       "order": 3,
