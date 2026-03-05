@@ -82,19 +82,19 @@
   },
   {
     "id": "obj_003",
-    "title": "Coin",
+    "title": "Gold Bezant of Jerusalem",
     "category": "Commerce",
     "tags": [],
     "year": "ca. 1140-1253",
     "hover": {
       "thumb": "images/objects/obj_003/003thumb.jpg",
-      "text": "Coin",
+      "text": "Gold Bezant of Jerusalem",
       "year": "ca. 1253",
       "location": "Jerusalem"
     },
     "panel": {
-      "subtitle": "Coin",
-      "body": "This coin, used in the crusaders’ Kingdom of Jerusalem, contains Arabic inscriptions on both sides, and are inspired by Arabic denars (coins), showing how commerce became a language for peace as Muslims and Christians engaged in trade with each other throughout the Middle East.",
+      "subtitle": "Golde Bezant if Jerusalem",
+      "body": "This coin, used in the crusaders’ Kingdom of Jerusalem, contains Arabic inscriptions on both sides, and is inspired by Arabic denars (coins), showing how commerce became a language for peace as Muslims and Christians engaged in trade with each other throughout the Middle East.",
       "year": "ca. 1253",
       "images": [
         "images/objects/obj_003/003image1.jpg",
@@ -718,7 +718,7 @@
     },
     "panel": {
       "subtitle": "Bowl With Lustre-Painted Depiction of a Sailing Ship",
-      "body": "This bowl was made in Malaga, under Muslim rule but depicts a Christian ship, most likely of Portuguese origin. This technique of lustre-painting was introduced to Valencia by Muslim traders, showing the commercial links between Muslims and Christians in Iberia..",
+      "body": "This bowl was made in Malaga, under Muslim rule, but depicts a Christian ship, most likely of Portuguese origin. This technique of lustre-painting was introduced to Valencia by Muslim traders, showing the commercial links between Muslims and Christians in Iberia.",
       "year": "ca. 1425-1450",
       "images": [
         "images/objects/obj_017/017image1.jpg",
